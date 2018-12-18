@@ -1,0 +1,154 @@
+#include<Servo.h>
+const int sensorMin = 0; 
+const int sensorMax = 1024;
+Servo servo1;
+const int trigPin = 2;
+const int echoPin = 3;
+
+const int pushButton = 10;
+
+
+void Initialize_PlxDaq()
+{
+Serial.println("CLEARDATA"); //clears up any data left from previous projects
+Serial.println("LABEL,Car,Seat,Weather,Fuel"); //always write LABEL, to indicate it as first line
+}
+void setup() 
+{
+  
+  int range;
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT);
+  servo1.attach(11);
+  Serial.begin(9600);
+  pinMode(pushButton,INPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  Serial.begin(9600);
+ Initialize_PlxDaq();
+
+}
+
+void loop() 
+{
+ //always write "DATA" to Indicate the following as Data
+   
+   while (Serial.available() >= 0) {
+    
+   char  x = Serial.read();
+   Serial.print("DATA,");
+   
+   delay(100);  
+    if(x=='A'){
+      digitalWrite(6,HIGH);
+      digitalWrite(7,LOW);
+      digitalWrite(8,HIGH);
+      digitalWrite(9,LOW);
+      delay(5000);
+      Serial.print("F");
+      Serial.print(",");
+      }
+    else{ if(x=='B'){
+      digitalWrite(7,HIGH);
+      digitalWrite(6,LOW);
+      digitalWrite(9,HIGH);
+      digitalWrite(8,LOW);
+      delay(5000);
+       Serial.print("B");
+      Serial.print(",");
+      }  else{
+      digitalWrite(6,LOW);
+      digitalWrite(7,LOW);
+      digitalWrite(8,LOW);
+      digitalWrite(9,LOW);
+      Serial.print("c");
+      Serial.print(",");}}
+      
+                                  
+    int seatBelt=digitalRead(pushButton);
+    if(seatBelt>0)
+    {
+     Serial.print("T");
+      Serial.print(",");}
+    else{
+     Serial.print("N");
+      Serial.print(",");
+     
+   }
+
+    int sensorReading = analogRead(A0);
+  int range = map(sensorReading, sensorMin, sensorMax, 0, 3);
+
+  if(range>=1.5){Serial.print('R');
+      Serial.print(",");
+  for(int i=0;i<3;i++){
+        servo1.write(220);
+        delay(125);
+        servo1.write(30);
+        }}
+        else Serial.print("n");
+
+   digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+// Sets the trigPin on HIGH state for 10 micro seconds
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+// Reads the echoPin, returns the sound wave travel time in microseconds
+int duration = pulseIn(echoPin, HIGH);
+// Calculating the distance
+int distance= duration*0.034/2;
+// Prints the distance on the Serial Monitor
+if(distance<3)
+{
+  Serial.println("90");
+      
+ 
+}
+else if(distance<3)
+{
+  Serial.println("80");
+  
+  
+  
+}
+else if(distance<3)
+{
+  Serial.println("70");
+  
+  
+}
+else if(distance<4)
+{
+  Serial.println("60");
+  
+ 
+}
+else if(distance<5)
+{
+  Serial.println("50");
+  
+  
+}
+else if(distance<6)
+{
+  Serial.println("40");
+  
+  
+}
+else if(distance<7)
+{
+  Serial.println("30");
+
+ 
+}
+else
+{
+  Serial.println("T");
+}
+}
+delay(100);
+}
+  
